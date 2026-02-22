@@ -1,0 +1,5 @@
+{
+  "watch": ["server.js", "routes", "controllers", "models", "config"],
+  "ignore": ["node_modules", "package-lock.json", "**/*.tmp", "**/*.log"],
+  "delay": "400"
+}
