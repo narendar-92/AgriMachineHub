@@ -25,7 +25,7 @@ export default function OwnerLogin() {
         body: JSON.stringify({ phone: phone.trim(), password })
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
       if (!res.ok || !data.token) {
         setError(data.message || "Invalid credentials");
@@ -35,7 +35,7 @@ export default function OwnerLogin() {
       localStorage.setItem("ownerToken", data.token);
       navigate("/owner");
     } catch {
-      setError("Login failed. Try again.");
+      setError(`Login failed. Unable to reach API at ${API_BASE}`);
     } finally {
       setLoading(false);
     }

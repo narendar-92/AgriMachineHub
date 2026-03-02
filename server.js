@@ -4,7 +4,8 @@ const connectDB = require("./config/db");
 
 const app = express();
 
-const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:5173")
+const corsOriginsEnv = process.env.CORS_ORIGINS;
+const allowedOrigins = (corsOriginsEnv || "http://localhost:5000")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
@@ -14,6 +15,10 @@ app.use(
   cors({
     origin: (origin, callback) => {
       // Allow server-to-server calls and tools without Origin header.
+      // If CORS_ORIGINS is not set, allow browser origins by default for easier first deploy.
+      if (!corsOriginsEnv) {
+        return callback(null, true);
+      }
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }

@@ -29,7 +29,7 @@ export default function OwnerRegister() {
         })
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError(data.message || "Registration failed");
         return;
@@ -37,7 +37,7 @@ export default function OwnerRegister() {
 
       navigate("/owner-login");
     } catch {
-      setError("Registration failed");
+      setError(`Registration failed. Unable to reach API at ${API_BASE}`);
     } finally {
       setLoading(false);
     }
