@@ -1,6 +1,18 @@
 const Booking = require("../models/Booking");
 const Machine = require("../models/Machine");
 const User = require("../models/User");
+const Owner = require("../models/Owner");
+
+const getOwnerMachineIds = async (ownerId) => {
+  const owner = await Owner.findById(ownerId).select("phone");
+  let machineQuery = { ownerId };
+  if (owner?.phone) {
+    machineQuery = { $or: [{ ownerId }, { phone: owner.phone }] };
+  }
+
+  const machines = await Machine.find(machineQuery).select("_id");
+  return machines.map((m) => m._id);
+};
 
 const createBooking = async (req, res) => {
   try {
@@ -63,7 +75,10 @@ const createBooking = async (req, res) => {
 
 const getBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find({ ownerId: req.ownerId }).populate("machineId");
+    const machineIds = await getOwnerMachineIds(req.ownerId);
+    const bookings = await Booking.find({
+      $or: [{ ownerId: req.ownerId }, { machineId: { $in: machineIds } }]
+    }).populate("machineId");
 
     return res.status(200).json({
       message: "Owner bookings fetched successfully",
@@ -92,7 +107,12 @@ const updateBookingStatus = async (req, res) => {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    if (String(booking.ownerId) !== String(req.ownerId)) {
+    const machineIds = await getOwnerMachineIds(req.ownerId);
+    const isOwner =
+      String(booking.ownerId) === String(req.ownerId) ||
+      machineIds.some((machineId) => String(machineId) === String(booking.machineId?._id));
+
+    if (!isOwner) {
       return res.status(403).json({ message: "Forbidden" });
     }
 
@@ -170,13 +190,18 @@ const cancelBooking = async (req, res) => {
 const deleteBooking = async (req, res) => {
   try {
     const { id } = req.params;
-    const booking = await Booking.findById(id);
+    const booking = await Booking.findById(id).populate("machineId");
 
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    if (String(booking.ownerId) !== String(req.ownerId)) {
+    const machineIds = await getOwnerMachineIds(req.ownerId);
+    const isOwner =
+      String(booking.ownerId) === String(req.ownerId) ||
+      machineIds.some((machineId) => String(machineId) === String(booking.machineId?._id));
+
+    if (!isOwner) {
       return res.status(403).json({ message: "Forbidden" });
     }
 
@@ -200,7 +225,12 @@ const completeBooking = async (req, res) => {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    if (String(booking.ownerId) !== String(req.ownerId)) {
+    const machineIds = await getOwnerMachineIds(req.ownerId);
+    const isOwner =
+      String(booking.ownerId) === String(req.ownerId) ||
+      machineIds.some((machineId) => String(machineId) === String(booking.machineId?._id));
+
+    if (!isOwner) {
       return res.status(403).json({ message: "Forbidden" });
     }
 
