@@ -1,20 +1,24 @@
 const Booking = require("../models/Booking");
 const Machine = require("../models/Machine");
+const User = require("../models/User");
 
 const createBooking = async (req, res) => {
   try {
     const {
       machineId,
-      farmerName,
-      farmerPhone,
       village,
       bookingDate,
       startTime,
       endTime
     } = req.body;
 
-    if (!machineId || !farmerName || !farmerPhone || !bookingDate || !startTime || !endTime) {
+    if (!machineId || !bookingDate || !startTime || !endTime) {
       return res.status(400).json({ message: "Missing required booking fields" });
+    }
+
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(401).json({ message: "User not found for this token" });
     }
 
     const machine = await Machine.findById(machineId);
@@ -24,7 +28,7 @@ const createBooking = async (req, res) => {
 
     const alreadyBooked = await Booking.findOne({
       machineId,
-      farmerPhone,
+      userId: req.userId,
       status: { $in: ["Pending", "Approved"] }
     });
 
@@ -33,10 +37,11 @@ const createBooking = async (req, res) => {
     }
 
     const booking = await Booking.create({
+      userId: req.userId,
       machineId,
       ownerId: machine.ownerId,
-      farmerName,
-      farmerPhone,
+      farmerName: user.name,
+      farmerPhone: user.phone,
       village,
       bookingDate,
       startTime,
@@ -114,12 +119,7 @@ const updateBookingStatus = async (req, res) => {
 
 const getUserBookings = async (req, res) => {
   try {
-    const { phone } = req.query;
-    if (!phone) {
-      return res.status(400).json({ message: "Phone is required" });
-    }
-
-    const bookings = await Booking.find({ farmerPhone: phone }).populate("machineId");
+    const bookings = await Booking.find({ userId: req.userId }).populate("machineId");
 
     return res.json({
       message: "User bookings fetched successfully",
@@ -142,7 +142,11 @@ const cancelBooking = async (req, res) => {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    if (["Rejected", "Completed"].includes(booking.status)) {
+    if (String(booking.userId) !== String(req.userId)) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    if (["Rejected", "Completed", "Cancelled"].includes(booking.status)) {
       return res.status(400).json({ message: "This booking cannot be cancelled" });
     }
 

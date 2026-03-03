@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const authOwner = require("../middleware/authOwner");
+const authUser = require("../middleware/authUser");
 const {
   addMachine,
   getMachines,
@@ -21,18 +22,24 @@ const {
   loginOwner,
   registerOwner
 } = require("../controllers/authController");
+const {
+  loginUser,
+  registerUser
+} = require("../controllers/userAuthController");
 
 router.post("/owner/register", registerOwner);
 router.post("/owner/login", loginOwner);
+router.post("/user/register", registerUser);
+router.post("/user/login", loginUser);
 
 router.get("/machines", getMachines);
 router.get("/machines/filter", filterMachines);
 router.post("/machines", authOwner, addMachine);
 router.get("/owner/machines", authOwner, getOwnerMachines);
 
-router.post("/book", createBooking);
-router.get("/user-bookings", getUserBookings);
-router.put("/book/cancel/:id", cancelBooking);
+router.post("/book", authUser, createBooking);
+router.get("/user-bookings", authUser, getUserBookings);
+router.put("/book/cancel/:id", authUser, cancelBooking);
 
 router.get("/bookings", authOwner, getBookings);
 router.put("/book/update/:id", authOwner, updateBookingStatus);

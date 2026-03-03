@@ -3,8 +3,6 @@ import { API_BASE } from "../config/api";
 
 export default function MachineCard({ machine }) {
   const [showForm, setShowForm] = useState(false);
-  const [farmerName, setFarmerName] = useState("");
-  const [farmerPhone, setFarmerPhone] = useState("");
   const [village, setVillage] = useState("");
   const [bookingDate, setBookingDate] = useState("");
   const [startTime, setStartTime] = useState("");
@@ -14,8 +12,6 @@ export default function MachineCard({ machine }) {
   const [isError, setIsError] = useState(false);
 
   const resetForm = () => {
-    setFarmerName("");
-    setFarmerPhone("");
     setVillage("");
     setBookingDate("");
     setStartTime("");
@@ -23,7 +19,14 @@ export default function MachineCard({ machine }) {
   };
 
   const handleBooking = async () => {
-    if (!farmerName || !farmerPhone || !village || !bookingDate || !startTime || !endTime) {
+    const token = localStorage.getItem("userToken");
+    if (!token) {
+      setIsError(true);
+      setMessage("Please login as user to book this machine.");
+      return;
+    }
+
+    if (!village || !bookingDate || !startTime || !endTime) {
       setIsError(true);
       setMessage("Please fill all booking fields.");
       return;
@@ -36,11 +39,12 @@ export default function MachineCard({ machine }) {
 
       const res = await fetch(`${API_BASE}/api/book`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
         body: JSON.stringify({
           machineId: machine._id,
-          farmerName,
-          farmerPhone,
           village,
           bookingDate,
           startTime,
@@ -83,25 +87,23 @@ export default function MachineCard({ machine }) {
         ) : null}
 
         {!showForm ? (
-          <button className="btn btn-success w-100" onClick={() => setShowForm(true)}>
+          <button
+            className="btn btn-success w-100"
+            onClick={() => {
+              if (!localStorage.getItem("userToken")) {
+                setIsError(true);
+                setMessage("Please login as user to book this machine.");
+                return;
+              }
+              setIsError(false);
+              setMessage("");
+              setShowForm(true);
+            }}
+          >
             Book Machine
           </button>
         ) : (
           <div className="border rounded p-3">
-            <input
-              className="form-control mt-2"
-              placeholder="Your Name"
-              value={farmerName}
-              onChange={(e) => setFarmerName(e.target.value)}
-            />
-
-            <input
-              className="form-control mt-2"
-              placeholder="Phone Number"
-              value={farmerPhone}
-              onChange={(e) => setFarmerPhone(e.target.value)}
-            />
-
             <input
               className="form-control mt-2"
               placeholder="Village"

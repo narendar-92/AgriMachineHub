@@ -3,14 +3,20 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const token = localStorage.getItem("ownerToken");
+  const ownerToken = localStorage.getItem("ownerToken");
+  const userToken = localStorage.getItem("userToken");
 
   const navLinkClass = (path) =>
     `nav-link ${location.pathname === path ? "active text-warning" : "text-white"}`;
 
-  const logout = () => {
+  const logoutOwner = () => {
     localStorage.removeItem("ownerToken");
     navigate("/owner-login");
+  };
+
+  const logoutUser = () => {
+    localStorage.removeItem("userToken");
+    navigate("/user-login");
   };
 
   return (
@@ -38,13 +44,36 @@ export default function Navbar() {
                 Find Machines
               </Link>
             </li>
-            <li className="nav-item">
-              <Link className={navLinkClass("/my-bookings")} to="/my-bookings">
-                My Bookings
-              </Link>
-            </li>
 
-            {token ? (
+            {userToken ? (
+              <>
+                <li className="nav-item">
+                  <Link className={navLinkClass("/user")} to="/user">
+                    User Dashboard
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className={navLinkClass("/my-bookings")} to="/my-bookings">
+                    My Bookings
+                  </Link>
+                </li>
+                <li className="nav-item ms-lg-2">
+                  <button type="button" className="btn btn-sm btn-light mt-1" onClick={logoutUser}>
+                    User Logout
+                  </button>
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="nav-item">
+                  <Link className={navLinkClass("/user-login")} to="/user-login">
+                    User Login
+                  </Link>
+                </li>
+              </>
+            )}
+
+            {ownerToken ? (
               <>
                 <li className="nav-item">
                   <Link className={navLinkClass("/owner")} to="/owner">
@@ -57,7 +86,7 @@ export default function Navbar() {
                   </Link>
                 </li>
                 <li className="nav-item ms-lg-2">
-                  <button type="button" className="btn btn-sm btn-light mt-1" onClick={logout}>
+                  <button type="button" className="btn btn-sm btn-light mt-1" onClick={logoutOwner}>
                     Logout
                   </button>
                 </li>
@@ -67,11 +96,6 @@ export default function Navbar() {
                 <li className="nav-item">
                   <Link className={navLinkClass("/owner-login")} to="/owner-login">
                     Owner Login
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link className={navLinkClass("/owner-register")} to="/owner-register">
-                    Owner Register
                   </Link>
                 </li>
               </>

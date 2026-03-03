@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { API_BASE } from "../config/api";
 
 const statusColor = (status) => {
@@ -9,43 +9,44 @@ const statusColor = (status) => {
 };
 
 export default function MyBookings() {
-  const [phone, setPhone] = useState("");
+  const token = localStorage.getItem("userToken");
   const [bookings, setBookings] = useState([]);
-  const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const checkBookings = async () => {
-    if (!phone.trim()) {
-      setError("Phone number is required");
-      return;
-    }
-
+  const fetchBookings = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
-
-      const res = await fetch(`${API_BASE}/api/user-bookings?phone=${encodeURIComponent(phone.trim())}`);
+      const res = await fetch(`${API_BASE}/api/user-bookings`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       const data = await res.json();
       if (!res.ok) {
+        if (res.status === 401) {
+          localStorage.removeItem("userToken");
+        }
         setError(data.message || "Failed to fetch bookings");
         setBookings([]);
       } else {
         setBookings(data.data || []);
       }
-      setSearched(true);
     } catch {
       setError("Failed to fetch bookings");
-      setSearched(true);
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    fetchBookings();
+  }, [fetchBookings]);
 
   const cancelBooking = async (id) => {
     try {
       const res = await fetch(`${API_BASE}/api/book/cancel/${id}`, {
-        method: "PUT"
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
       if (!res.ok) {
@@ -62,24 +63,10 @@ export default function MyBookings() {
   return (
     <div className="container mt-4">
       <h2>My Bookings</h2>
-
-      <div className="card p-3 mt-3">
-        <label htmlFor="phone"><b>Enter Phone Number</b></label>
-        <input
-          id="phone"
-          type="text"
-          className="form-control"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
-        <button className="btn btn-success mt-3" onClick={checkBookings} disabled={loading}>
-          {loading ? "Checking..." : "Check Status"}
-        </button>
-      </div>
-
+      {loading && <p className="mt-3">Loading bookings...</p>}
       {error && <p className="text-danger mt-3">{error}</p>}
-      {searched && !loading && bookings.length === 0 && !error && (
-        <h4 className="mt-4 text-danger">No bookings found for this number</h4>
+      {!loading && bookings.length === 0 && !error && (
+        <h4 className="mt-4 text-danger">No bookings found</h4>
       )}
 
       {bookings.map((b) => (
