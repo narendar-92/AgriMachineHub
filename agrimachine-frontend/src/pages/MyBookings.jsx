@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { API_BASE } from "../config/api";
+import { payOnlineBooking } from "../utils/bookingPayment";
 
 const statusColor = (status) => {
   if (status === "Approved") return "success";
@@ -60,6 +61,16 @@ export default function MyBookings() {
     }
   };
 
+  const handleOnlinePayment = async (bookingId) => {
+    try {
+      await payOnlineBooking({ bookingId, token });
+      await fetchBookings();
+      alert("Payment completed successfully");
+    } catch (error) {
+      alert(error.message || "Payment failed");
+    }
+  };
+
   return (
     <div className="container mt-4">
       <h2>My Bookings</h2>
@@ -77,6 +88,16 @@ export default function MyBookings() {
           <p><b>Date:</b> {b.bookingDate}</p>
           <p><b>Time:</b> {b.startTime} to {b.endTime}</p>
           <p><b>Price:</b> Rs {b.machineId?.pricePerHour} / hour</p>
+          <p>
+            <b>Payment Method:</b>{" "}
+            {b.paymentMethod === "OnlineBeforeWork" ? "Online before work" : "Cash on completion"}
+          </p>
+          <p>
+            <b>Payment Status:</b>{" "}
+            <span className={`badge text-bg-${b.paymentStatus === "Paid" ? "success" : "warning"}`}>
+              {b.paymentStatus || "Pending"}
+            </span>
+          </p>
 
           <p>
             <b>Status:</b>{" "}
@@ -90,6 +111,17 @@ export default function MyBookings() {
               Cancel Booking
             </button>
           )}
+
+          {b.paymentMethod === "OnlineBeforeWork" &&
+            b.paymentStatus !== "Paid" &&
+            !["Cancelled", "Rejected", "Completed"].includes(b.status) && (
+              <button
+                className="btn btn-primary mt-2 ms-2"
+                onClick={() => handleOnlinePayment(b._id)}
+              >
+                Pay Now
+              </button>
+            )}
         </div>
       ))}
     </div>

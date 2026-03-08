@@ -24,6 +24,19 @@ const bookingSchema = new mongoose.Schema({
   bookingDate: String,
   startTime: String,
   endTime: String,
+  paymentMethod: {
+    type: String,
+    enum: ["CashAfterWork", "OnlineBeforeWork"],
+    default: "CashAfterWork"
+  },
+  paymentStatus: {
+    type: String,
+    enum: ["Pending", "Paid"],
+    default: "Pending"
+  },
+  paymentOrderId: String,
+  paymentTransactionId: String,
+  paidAt: Date,
 
   status: {
     type: String,

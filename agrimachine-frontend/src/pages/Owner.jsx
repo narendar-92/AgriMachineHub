@@ -127,6 +127,16 @@ export default function Owner() {
           <p className="mb-1"><b>Village:</b> {b.village}</p>
           <p className="mb-1"><b>Date:</b> {b.bookingDate}</p>
           <p className="mb-3"><b>Time:</b> {b.startTime} to {b.endTime}</p>
+          <p className="mb-1">
+            <b>Payment Method:</b>{" "}
+            {b.paymentMethod === "OnlineBeforeWork" ? "Online before work" : "Cash on completion"}
+          </p>
+          <p className="mb-3">
+            <b>Payment Status:</b>{" "}
+            <span className={`badge text-bg-${b.paymentStatus === "Paid" ? "success" : "warning"}`}>
+              {b.paymentStatus || "Pending"}
+            </span>
+          </p>
 
           <div className="d-flex gap-2 flex-wrap">
             {b.status === "Pending" ? (

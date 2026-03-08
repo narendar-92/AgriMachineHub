@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { API_BASE } from "../config/api";
+import { payOnlineBooking } from "../utils/bookingPayment";
 
 export default function MachineCard({ machine }) {
   const [showForm, setShowForm] = useState(false);
@@ -7,6 +8,7 @@ export default function MachineCard({ machine }) {
   const [bookingDate, setBookingDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("CashAfterWork");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
@@ -16,6 +18,7 @@ export default function MachineCard({ machine }) {
     setBookingDate("");
     setStartTime("");
     setEndTime("");
+    setPaymentMethod("CashAfterWork");
   };
 
   const handleBooking = async () => {
@@ -48,7 +51,8 @@ export default function MachineCard({ machine }) {
           village,
           bookingDate,
           startTime,
-          endTime
+          endTime,
+          paymentMethod
         })
       });
 
@@ -59,7 +63,21 @@ export default function MachineCard({ machine }) {
         return;
       }
 
-      setMessage("Booking submitted successfully.");
+      if (paymentMethod === "OnlineBeforeWork") {
+        try {
+          await payOnlineBooking({ bookingId: data?.data?._id, token });
+          setIsError(false);
+          setMessage("Booking submitted and payment completed successfully.");
+        } catch (paymentError) {
+          setIsError(true);
+          setMessage(
+            `${paymentError.message}. Booking was created. You can complete payment from My Bookings.`
+          );
+        }
+      } else {
+        setMessage("Booking submitted successfully.");
+      }
+
       setShowForm(false);
       resetForm();
     } catch {
@@ -131,6 +149,16 @@ export default function MachineCard({ machine }) {
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
             />
+
+            <label className="form-label mt-3 mb-1"><b>Payment Option</b></label>
+            <select
+              className="form-select"
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+            >
+              <option value="CashAfterWork">Cash on completion (after work)</option>
+              <option value="OnlineBeforeWork">Online before work</option>
+            </select>
 
             <button className="btn btn-primary mt-3 w-100" onClick={handleBooking} disabled={loading}>
               {loading ? "Submitting..." : "Submit Booking"}

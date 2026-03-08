@@ -11,6 +11,8 @@ const {
 } = require("../controllers/machineController");
 const {
   createBooking,
+  createBookingPaymentOrder,
+  verifyBookingPayment,
   getBookings,
   updateBookingStatus,
   getUserBookings,
@@ -38,6 +40,8 @@ router.post("/machines", authOwner, addMachine);
 router.get("/owner/machines", authOwner, getOwnerMachines);
 
 router.post("/book", authUser, createBooking);
+router.post("/book/:id/payment/order", authUser, createBookingPaymentOrder);
+router.post("/book/:id/payment/verify", authUser, verifyBookingPayment);
 router.get("/user-bookings", authUser, getUserBookings);
 router.put("/book/cancel/:id", authUser, cancelBooking);
 

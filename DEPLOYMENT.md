@@ -13,6 +13,8 @@
    - `PORT=10000`
    - `MONGO_URI=<your-mongodb-atlas-uri>`
    - `JWT_SECRET=<strong-random-secret>`
+   - `RAZORPAY_KEY_ID=<your-razorpay-key-id>`
+   - `RAZORPAY_KEY_SECRET=<your-razorpay-key-secret>`
    - `CORS_ORIGINS=https://<your-vercel-domain>`
 5. Deploy and copy the backend URL, e.g. `https://agrimachinehub-backend.onrender.com`.
 
