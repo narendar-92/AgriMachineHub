@@ -1,0 +1,4 @@
+node_modules
+.env
+agrimachine-frontend/node_modules
+agrimachine-frontend/dist
