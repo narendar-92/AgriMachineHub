@@ -7,8 +7,14 @@ const {
   addMachine,
   getMachines,
   filterMachines,
-  getOwnerMachines
+  getOwnerMachines,
+  getMachineById
 } = require("../controllers/machineController");
+const {
+  getOwnerProfile,
+  getOwnerMachinesPublic,
+  rateOwner
+} = require("../controllers/ownerProfileController");
 const {
   createBooking,
   createBookingPaymentOrder,
@@ -36,8 +42,13 @@ router.post("/user/login", loginUser);
 
 router.get("/machines", getMachines);
 router.get("/machines/filter", filterMachines);
+router.get("/machines/:id", getMachineById);
 router.post("/machines", authOwner, addMachine);
 router.get("/owner/machines", authOwner, getOwnerMachines);
+
+router.get("/owners/:id", getOwnerProfile);
+router.get("/owners/:id/machines", getOwnerMachinesPublic);
+router.post("/owners/:id/rate", authUser, rateOwner);
 
 router.post("/book", authUser, createBooking);
 router.post("/book/:id/payment/order", authUser, createBookingPaymentOrder);

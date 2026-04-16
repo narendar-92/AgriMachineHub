@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { API_BASE } from "../config/api";
 import { payOnlineBooking } from "../utils/bookingPayment";
+import { addToCart, isInCart, removeFromCart } from "../utils/cart";
 
 export default function MachineCard({ machine }) {
   const [showForm, setShowForm] = useState(false);
@@ -12,6 +14,9 @@ export default function MachineCard({ machine }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
+  const [cartVersion, setCartVersion] = useState(0);
+
+  const inCart = isInCart(machine?._id) && cartVersion >= 0;
 
   const resetForm = () => {
     setVillage("");
@@ -90,6 +95,14 @@ export default function MachineCard({ machine }) {
 
   return (
     <div className="card shadow-sm h-100">
+      {machine?.images?.[0] ? (
+        <img
+          src={machine.images[0]}
+          alt={machine.name}
+          className="card-img-top"
+          style={{ height: 180, objectFit: "cover" }}
+        />
+      ) : null}
       <div className="card-body">
         <h5 className="card-title">{machine.name}</h5>
         <p className="mb-1"><b>Owner:</b> {machine.ownerName}</p>
@@ -99,6 +112,30 @@ export default function MachineCard({ machine }) {
         <p className="mb-3">
           <b>Location:</b> {machine?.location?.village}, {machine?.location?.district}, {machine?.location?.state}
         </p>
+
+        <div className="d-flex gap-2 mb-3 flex-wrap">
+          {machine?.ownerId ? (
+            <Link className="btn btn-outline-success btn-sm" to={`/owners/${machine.ownerId}`}>
+              View Owner Profile
+            </Link>
+          ) : null}
+
+          <button
+            type="button"
+            className={`btn btn-sm ${inCart ? "btn-outline-danger" : "btn-outline-primary"}`}
+            onClick={() => {
+              if (!machine?._id) return;
+              if (isInCart(machine._id)) {
+                removeFromCart(machine._id);
+              } else {
+                addToCart(machine._id);
+              }
+              setCartVersion((x) => x + 1);
+            }}
+          >
+            {inCart ? "Remove from Cart" : "Add to Cart"}
+          </button>
+        </div>
 
         {message ? (
           <p className={isError ? "text-danger" : "text-success"}>{message}</p>

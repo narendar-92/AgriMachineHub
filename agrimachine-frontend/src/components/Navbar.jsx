@@ -1,10 +1,23 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { getCartMachineIds } from "../utils/cart";
 
 export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const ownerToken = localStorage.getItem("ownerToken");
   const userToken = localStorage.getItem("userToken");
+  const [cartCount, setCartCount] = useState(() => getCartMachineIds().length);
+
+  useEffect(() => {
+    const onUpdate = () => setCartCount(getCartMachineIds().length);
+    window.addEventListener("cartUpdated", onUpdate);
+    window.addEventListener("storage", onUpdate);
+    return () => {
+      window.removeEventListener("cartUpdated", onUpdate);
+      window.removeEventListener("storage", onUpdate);
+    };
+  }, []);
 
   const navLinkClass = (path) =>
     `nav-link ${location.pathname === path ? "active text-warning" : "text-white"}`;
@@ -42,6 +55,12 @@ export default function Navbar() {
             <li className="nav-item">
               <Link className={navLinkClass("/machines")} to="/machines">
                 Find Machines
+              </Link>
+            </li>
+
+            <li className="nav-item">
+              <Link className={navLinkClass("/cart")} to="/cart">
+                Cart{cartCount ? ` (${cartCount})` : ""}
               </Link>
             </li>
 

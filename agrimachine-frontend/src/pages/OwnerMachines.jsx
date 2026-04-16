@@ -12,12 +12,25 @@ const initialForm = {
   state: ""
 };
 
+const MAX_IMAGES = 5;
+const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024; // 2MB
+
+const fileToDataUrl = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = () => reject(new Error("Failed to read image"));
+    reader.readAsDataURL(file);
+  });
+
 export default function OwnerMachines() {
   const token = localStorage.getItem("ownerToken");
   const [machines, setMachines] = useState([]);
   const [form, setForm] = useState(initialForm);
+  const [images, setImages] = useState([]);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [processingImages, setProcessingImages] = useState(false);
 
   const fetchOwnerMachines = async () => {
     try {
@@ -40,6 +53,41 @@ export default function OwnerMachines() {
     fetchOwnerMachines();
   }, [token]);
 
+  const onSelectImages = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) {
+      setImages([]);
+      return;
+    }
+
+    if (files.length > MAX_IMAGES) {
+      setError(`You can upload up to ${MAX_IMAGES} images.`);
+      e.target.value = "";
+      setImages([]);
+      return;
+    }
+
+    const tooLarge = files.find((f) => f.size > MAX_IMAGE_SIZE_BYTES);
+    if (tooLarge) {
+      setError("Each image must be 2MB or smaller.");
+      e.target.value = "";
+      setImages([]);
+      return;
+    }
+
+    try {
+      setProcessingImages(true);
+      setError("");
+      const urls = await Promise.all(files.map(fileToDataUrl));
+      setImages(urls);
+    } catch {
+      setError("Failed to read selected images.");
+      setImages([]);
+    } finally {
+      setProcessingImages(false);
+    }
+  };
+
   const addMachine = async () => {
     const required = [
       form.name,
@@ -55,7 +103,7 @@ export default function OwnerMachines() {
     }
 
     try {
-      setLoading(true);
+      setSubmitting(true);
       setError("");
       const res = await fetch(`${API_BASE}/api/machines`, {
         method: "POST",
@@ -69,6 +117,7 @@ export default function OwnerMachines() {
           phone: form.phone.trim(),
           type: form.type.trim(),
           pricePerHour: Number(form.pricePerHour),
+          images,
           location: {
             village: form.village.trim(),
             district: form.district.trim(),
@@ -84,11 +133,12 @@ export default function OwnerMachines() {
       }
 
       setForm(initialForm);
+      setImages([]);
       await fetchOwnerMachines();
     } catch {
       setError("Failed to add machine");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -166,9 +216,36 @@ export default function OwnerMachines() {
               onChange={(e) => setForm((prev) => ({ ...prev, state: e.target.value }))}
             />
           </div>
+          <div className="col-12">
+            <label className="form-label mb-1"><b>Machine Photos</b> (optional, up to {MAX_IMAGES})</label>
+            <input
+              className="form-control"
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={onSelectImages}
+              disabled={submitting || processingImages}
+            />
+            {images.length ? (
+              <div className="d-flex flex-wrap gap-2 mt-2">
+                {images.map((src, idx) => (
+                  <img
+                    key={idx}
+                    src={src}
+                    alt={`Machine ${idx + 1}`}
+                    style={{ width: 80, height: 60, objectFit: "cover", borderRadius: 6, border: "1px solid #ddd" }}
+                  />
+                ))}
+              </div>
+            ) : null}
+          </div>
           <div className="col-md-6">
-            <button className="btn btn-success w-100" onClick={addMachine} disabled={loading}>
-              {loading ? "Adding..." : "Add Machine"}
+            <button
+              className="btn btn-success w-100"
+              onClick={addMachine}
+              disabled={submitting || processingImages}
+            >
+              {submitting ? "Adding..." : processingImages ? "Processing images..." : "Add Machine"}
             </button>
           </div>
         </div>
@@ -180,6 +257,13 @@ export default function OwnerMachines() {
         {machines.map((m) => (
           <div className="col-md-6 col-lg-4 mt-3" key={m._id}>
             <div className="card p-3 h-100">
+              {m.images?.[0] ? (
+                <img
+                  src={m.images[0]}
+                  alt={m.name}
+                  style={{ width: "100%", height: 160, objectFit: "cover", borderRadius: 8 }}
+                />
+              ) : null}
               <h5>{m.name}</h5>
               <p className="mb-1"><b>Type:</b> {m.type}</p>
               <p className="mb-1"><b>Price:</b> Rs {m.pricePerHour}/hour</p>

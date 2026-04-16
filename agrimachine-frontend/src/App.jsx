@@ -4,11 +4,13 @@ import ProtectedOwnerRoute from "./components/ProtectedOwnerRoute";
 import ProtectedUserRoute from "./components/ProtectedUserRoute";
 import Home from "./pages/Home";
 import Machines from "./pages/Machines";
+import Cart from "./pages/Cart";
 import MyBookings from "./pages/MyBookings";
 import OwnerLogin from "./pages/OwnerLogin";
 import OwnerRegister from "./pages/OwnerRegister";
 import Owner from "./pages/Owner";
 import OwnerMachines from "./pages/OwnerMachines";
+import OwnerProfile from "./pages/OwnerProfile";
 import UserLogin from "./pages/UserLogin";
 import UserRegister from "./pages/UserRegister";
 import User from "./pages/User";
@@ -20,6 +22,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/machines" element={<Machines />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/owners/:id" element={<OwnerProfile />} />
         <Route
           path="/my-bookings"
           element={

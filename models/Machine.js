@@ -7,6 +7,11 @@ const machineSchema = new mongoose.Schema(
       required: true
     },
 
+    images: {
+      type: [String],
+      default: []
+    },
+
     ownerName: {
       type: String,
       required: true
