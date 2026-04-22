@@ -45,10 +45,11 @@ export default function UserRegister() {
   };
 
   return (
-    <div className="container mt-4" style={{ maxWidth: "520px" }}>
-      <h2>User Registration</h2>
-      <p className="text-muted">Create your account to book machines and track bookings.</p>
-      {error && <p className="text-danger">{error}</p>}
+    <div className="container mt-5 mb-5 d-flex justify-content-center">
+      <div className="soft-shadow p-5" style={{ maxWidth: "520px", width: "100%" }}>
+        <h2 className="fw-bold text-primary-dark mb-2">User Registration</h2>
+        <p className="text-muted mb-4">Create your account to book machines and track bookings.</p>
+        {error && <div className="alert alert-danger py-2">{error}</div>}
 
       <input
         className="form-control mt-2"
@@ -70,13 +71,14 @@ export default function UserRegister() {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <button className="btn btn-success mt-3 w-100" onClick={register} disabled={loading}>
-        {loading ? "Creating account..." : "Register"}
-      </button>
+        <button className="btn btn-success mt-4 w-100 py-2 shadow-sm" onClick={register} disabled={loading}>
+          {loading ? "Creating account..." : "Register"}
+        </button>
 
-      <p className="mt-3 mb-0">
-        Already registered? <Link to="/user-login">Login</Link>
-      </p>
+        <p className="mt-4 text-center mb-0 text-muted">
+          Already registered? <Link to="/user-login" className="text-success text-decoration-none fw-medium">Login here</Link>
+        </p>
+      </div>
     </div>
   );
 }

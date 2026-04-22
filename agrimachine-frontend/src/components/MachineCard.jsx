@@ -94,7 +94,7 @@ export default function MachineCard({ machine }) {
   };
 
   return (
-    <div className="card shadow-sm h-100">
+    <div className="card soft-shadow hover-lift h-100 border-0">
       {machine?.images?.[0] ? (
         <img
           src={machine.images[0]}
@@ -103,15 +103,20 @@ export default function MachineCard({ machine }) {
           style={{ height: 180, objectFit: "cover" }}
         />
       ) : null}
-      <div className="card-body">
-        <h5 className="card-title">{machine.name}</h5>
-        <p className="mb-1"><b>Owner:</b> {machine.ownerName}</p>
-        <p className="mb-1"><b>Phone:</b> {machine.phone}</p>
-        <p className="mb-1"><b>Type:</b> {machine.type}</p>
-        <p className="mb-1"><b>Price:</b> Rs {machine.pricePerHour}/hour</p>
-        <p className="mb-3">
-          <b>Location:</b> {machine?.location?.village}, {machine?.location?.district}, {machine?.location?.state}
-        </p>
+      <div className="card-body d-flex flex-column">
+        <h5 className="card-title fw-bold text-primary-dark mb-3">{machine.name}</h5>
+        
+        <div className="d-flex flex-wrap gap-2 mb-3">
+          <span className="badge badge-machine">{machine.type}</span>
+          <span className="badge bg-light text-dark border">⭐ {machine.ownerName}</span>
+        </div>
+
+        <div className="mb-3 text-muted" style={{ fontSize: "0.9rem" }}>
+          <div className="d-flex mb-1"><i className="bi bi-telephone-fill me-2 text-success"></i> {machine.phone}</div>
+          <div className="d-flex mb-1"><i className="bi bi-geo-alt-fill me-2 text-success"></i> {machine?.location?.village}, {machine?.location?.district}</div>
+        </div>
+
+        <h4 className="text-success fw-bold mb-4 mt-auto">Rs {machine.pricePerHour}<span className="fs-6 text-muted fw-normal">/hour</span></h4>
 
         <div className="d-flex gap-2 mb-3 flex-wrap">
           {machine?.ownerId ? (

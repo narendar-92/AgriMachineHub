@@ -20,7 +20,7 @@ export default function Navbar() {
   }, []);
 
   const navLinkClass = (path) =>
-    `nav-link ${location.pathname === path ? "active text-warning" : "text-white"}`;
+    `nav-link ${location.pathname === path ? "active" : ""}`;
 
   const logoutOwner = () => {
     localStorage.removeItem("ownerToken");
@@ -33,7 +33,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-success">
+    <nav className="navbar navbar-expand-lg navbar-custom sticky-top">
       <div className="container">
         <Link className="navbar-brand fw-bold" to="/">
           AgriMachineHub
@@ -77,7 +77,7 @@ export default function Navbar() {
                   </Link>
                 </li>
                 <li className="nav-item ms-lg-2">
-                  <button type="button" className="btn btn-sm btn-light mt-1" onClick={logoutUser}>
+                  <button type="button" className="btn btn-sm btn-outline-success mt-1" onClick={logoutUser}>
                     User Logout
                   </button>
                 </li>
@@ -105,7 +105,7 @@ export default function Navbar() {
                   </Link>
                 </li>
                 <li className="nav-item ms-lg-2">
-                  <button type="button" className="btn btn-sm btn-light mt-1" onClick={logoutOwner}>
+                  <button type="button" className="btn btn-sm btn-outline-success mt-1" onClick={logoutOwner}>
                     Logout
                   </button>
                 </li>

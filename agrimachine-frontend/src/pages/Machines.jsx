@@ -45,12 +45,12 @@ export default function Machines() {
     <div className="container mt-4">
       <h2>Available Machines</h2>
 
-      <div className="card p-3 mt-3">
-        <h5>Search Machines</h5>
+      <div className="soft-shadow p-4 mt-4 mb-5">
+        <h5 className="mb-3 text-primary-dark">Find the perfect machine</h5>
 
-        <div className="row">
+        <div className="row g-3">
           <div className="col-md-4">
-            <label htmlFor="district">District</label>
+            <label htmlFor="district" className="form-label text-muted fw-medium mb-1">Location (District)</label>
             <input
               id="district"
               type="text"
@@ -62,19 +62,19 @@ export default function Machines() {
           </div>
 
           <div className="col-md-4">
-            <label htmlFor="type">Machine Type</label>
+            <label htmlFor="type" className="form-label text-muted fw-medium mb-1">Machine Type</label>
             <input
               id="type"
               type="text"
               className="form-control"
               value={type}
               onChange={(e) => setType(e.target.value)}
-              placeholder="Tractor / Harvester"
+              placeholder="Tractor, Harvester..."
             />
           </div>
 
-          <div className="col-md-4 d-flex align-items-end gap-2 mt-3 mt-md-0">
-            <button className="btn btn-success w-100" onClick={handleSearch}>
+          <div className="col-md-4 d-flex align-items-end gap-2">
+            <button className="btn btn-success w-100 shadow-sm" onClick={handleSearch}>
               Search
             </button>
             <button
@@ -85,7 +85,7 @@ export default function Machines() {
                 fetchMachines();
               }}
             >
-              Reset
+              Clear
             </button>
           </div>
         </div>
