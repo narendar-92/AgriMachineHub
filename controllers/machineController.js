@@ -133,10 +133,87 @@ const getMachineById = async (req, res) => {
   }
 };
 
+// ---------------- UPDATE MACHINE ----------------
+const updateMachine = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, ownerName, phone, type, pricePerHour, location, available } = req.body;
+
+    const machine = await Machine.findById(id);
+    if (!machine) {
+      return res.status(404).json({ message: "Machine not found" });
+    }
+
+    if (machine.ownerId.toString() !== req.ownerId) {
+      return res.status(403).json({ message: "Not authorized to update this machine" });
+    }
+
+    if (name) machine.name = String(name).trim();
+    if (ownerName) machine.ownerName = String(ownerName).trim();
+    if (phone) machine.phone = String(phone).trim();
+    if (type) machine.type = String(type).trim();
+    if (pricePerHour !== undefined) {
+      const price = Number(pricePerHour);
+      if (Number.isFinite(price) && price > 0) {
+        machine.pricePerHour = price;
+      }
+    }
+    if (location) {
+      if (location.village !== undefined) machine.location.village = String(location.village).trim();
+      if (location.district !== undefined) machine.location.district = String(location.district).trim();
+      if (location.state !== undefined) machine.location.state = String(location.state).trim();
+    }
+    if (available !== undefined) {
+      machine.available = Boolean(available);
+    }
+
+    await machine.save();
+
+    res.status(200).json({
+      message: "Machine updated successfully",
+      machine
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to update machine",
+      error: error.message
+    });
+  }
+};
+
+// ---------------- DELETE MACHINE ----------------
+const deleteMachine = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const machine = await Machine.findById(id);
+    if (!machine) {
+      return res.status(404).json({ message: "Machine not found" });
+    }
+
+    if (machine.ownerId.toString() !== req.ownerId) {
+      return res.status(403).json({ message: "Not authorized to delete this machine" });
+    }
+
+    await machine.deleteOne();
+
+    res.status(200).json({
+      message: "Machine deleted successfully"
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to delete machine",
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   addMachine,
   getMachines,
   filterMachines,
   getOwnerMachines,
-  getMachineById
+  getMachineById,
+  updateMachine,
+  deleteMachine
 };

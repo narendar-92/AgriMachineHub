@@ -8,7 +8,9 @@ const {
   getMachines,
   filterMachines,
   getOwnerMachines,
-  getMachineById
+  getMachineById,
+  updateMachine,
+  deleteMachine
 } = require("../controllers/machineController");
 const {
   getOwnerProfile,
@@ -44,6 +46,8 @@ router.get("/machines", getMachines);
 router.get("/machines/filter", filterMachines);
 router.get("/machines/:id", getMachineById);
 router.post("/machines", authOwner, addMachine);
+router.put("/machines/:id", authOwner, updateMachine);
+router.delete("/machines/:id", authOwner, deleteMachine);
 router.get("/owner/machines", authOwner, getOwnerMachines);
 
 router.get("/owners/:id", getOwnerProfile);
