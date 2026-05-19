@@ -87,7 +87,6 @@ export default function MyBookings() {
           <p><b>Owner Phone:</b> {b.machineId?.phone}</p>
           <p><b>Village:</b> {b.village}</p>
           <p><b>Date:</b> {b.bookingDate}</p>
-          <p><b>Time:</b> {b.startTime} to {b.endTime}</p>
           <p><b>Price:</b> Rs {b.machineId?.pricePerHour} / hour</p>
           <p>
             <b>Payment Method:</b>{" "}

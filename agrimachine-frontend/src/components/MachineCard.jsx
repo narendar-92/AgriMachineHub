@@ -8,8 +8,6 @@ export default function MachineCard({ machine }) {
   const [showForm, setShowForm] = useState(false);
   const [village, setVillage] = useState("");
   const [bookingDate, setBookingDate] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("CashAfterWork");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -21,8 +19,6 @@ export default function MachineCard({ machine }) {
   const resetForm = () => {
     setVillage("");
     setBookingDate("");
-    setStartTime("");
-    setEndTime("");
     setPaymentMethod("CashAfterWork");
   };
 
@@ -34,7 +30,7 @@ export default function MachineCard({ machine }) {
       return;
     }
 
-    if (!village || !bookingDate || !startTime || !endTime) {
+    if (!village || !bookingDate) {
       setIsError(true);
       setMessage("Please fill all booking fields.");
       return;
@@ -55,8 +51,6 @@ export default function MachineCard({ machine }) {
           machineId: machine._id,
           village,
           bookingDate,
-          startTime,
-          endTime,
           paymentMethod
         })
       });
@@ -177,20 +171,6 @@ export default function MachineCard({ machine }) {
               type="date"
               value={bookingDate}
               onChange={(e) => setBookingDate(e.target.value)}
-            />
-
-            <input
-              className="form-control mt-2"
-              type="time"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-            />
-
-            <input
-              className="form-control mt-2"
-              type="time"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
             />
 
             <label className="form-label mt-3 mb-1"><b>Payment Option</b></label>

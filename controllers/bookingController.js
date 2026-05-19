@@ -32,21 +32,8 @@ const calculateBookingAmountInPaise = (booking, machine) => {
     throw new Error("Machine price is invalid");
   }
 
-  const [startH, startM] = String(booking.startTime || "").split(":").map(Number);
-  const [endH, endM] = String(booking.endTime || "").split(":").map(Number);
-  if ([startH, startM, endH, endM].some((n) => Number.isNaN(n))) {
-    throw new Error("Booking time is invalid");
-  }
-
-  let startMinutes = startH * 60 + startM;
-  let endMinutes = endH * 60 + endM;
-  if (endMinutes <= startMinutes) {
-    endMinutes += 24 * 60;
-  }
-
-  const hours = (endMinutes - startMinutes) / 60;
-  const billableHours = Math.max(hours, 1);
-  return Math.round(pricePerHour * billableHours * 100);
+  // Assuming a minimum charge of 1 hour if not specified otherwise
+  return Math.round(pricePerHour * 100);
 };
 
 const createBooking = async (req, res) => {
@@ -55,12 +42,10 @@ const createBooking = async (req, res) => {
       machineId,
       village,
       bookingDate,
-      startTime,
-      endTime,
       paymentMethod
     } = req.body;
 
-    if (!machineId || !bookingDate || !startTime || !endTime) {
+    if (!machineId || !bookingDate || !village) {
       return res.status(400).json({ message: "Missing required booking fields" });
     }
 
@@ -101,8 +86,6 @@ const createBooking = async (req, res) => {
       farmerPhone: user.phone,
       village,
       bookingDate,
-      startTime,
-      endTime,
       paymentMethod: normalizedPaymentMethod,
       paymentStatus: "Pending",
       status: "Pending"

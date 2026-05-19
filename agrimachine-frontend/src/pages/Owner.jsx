@@ -126,7 +126,6 @@ export default function Owner() {
           <p className="mb-1"><b>Phone:</b> {b.farmerPhone}</p>
           <p className="mb-1"><b>Village:</b> {b.village}</p>
           <p className="mb-1"><b>Date:</b> {b.bookingDate}</p>
-          <p className="mb-3"><b>Time:</b> {b.startTime} to {b.endTime}</p>
           <p className="mb-1">
             <b>Payment Method:</b>{" "}
             {b.paymentMethod === "OnlineBeforeWork" ? "Online before work" : "Cash on completion"}
