@@ -89,13 +89,43 @@ export default function MachineCard({ machine }) {
 
   return (
     <div className="card soft-shadow hover-lift h-100 border-0">
-      {machine?.images?.[0] ? (
-        <img
-          src={machine.images[0]}
-          alt={machine.name}
-          className="card-img-top"
-          style={{ height: 180, objectFit: "cover" }}
-        />
+      {machine?.images?.length > 0 ? (
+        <div id={`carousel-${machine._id}`} className="carousel slide">
+          <div className="carousel-inner">
+            {machine.images.map((img, index) => (
+              <div className={`carousel-item ${index === 0 ? "active" : ""}`} key={index}>
+                <img
+                  src={img}
+                  alt={`${machine.name} ${index + 1}`}
+                  className="d-block w-100 card-img-top"
+                  style={{ height: 180, objectFit: "cover" }}
+                />
+              </div>
+            ))}
+          </div>
+          {machine.images.length > 1 && (
+            <>
+              <button
+                className="carousel-control-prev"
+                type="button"
+                data-bs-target={`#carousel-${machine._id}`}
+                data-bs-slide="prev"
+              >
+                <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span className="visually-hidden">Previous</span>
+              </button>
+              <button
+                className="carousel-control-next"
+                type="button"
+                data-bs-target={`#carousel-${machine._id}`}
+                data-bs-slide="next"
+              >
+                <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                <span className="visually-hidden">Next</span>
+              </button>
+            </>
+          )}
+        </div>
       ) : null}
       <div className="card-body d-flex flex-column">
         <h5 className="card-title fw-bold text-primary-dark mb-3">{machine.name}</h5>
