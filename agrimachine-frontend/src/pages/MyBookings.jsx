@@ -10,7 +10,7 @@ const statusColor = (status) => {
 };
 
 export default function MyBookings() {
-  const token = localStorage.getItem("userToken");
+  const token = localStorage.getItem("userToken") || localStorage.getItem("ownerToken");
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -25,7 +25,8 @@ export default function MyBookings() {
       const data = await res.json();
       if (!res.ok) {
         if (res.status === 401) {
-          localStorage.removeItem("userToken");
+          if (localStorage.getItem("userToken")) localStorage.removeItem("userToken");
+          else if (localStorage.getItem("ownerToken")) localStorage.removeItem("ownerToken");
         }
         setError(data.message || "Failed to fetch bookings");
         setBookings([]);

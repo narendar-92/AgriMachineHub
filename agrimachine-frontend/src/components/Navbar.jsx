@@ -129,6 +129,11 @@ export default function Navbar() {
                       <i className="bi bi-tractor me-3 text-muted"></i> Manage Machines
                     </Link>
                   </li>
+                  <li>
+                    <Link className="dropdown-item py-2 d-flex align-items-center" to="/my-bookings">
+                      <i className="bi bi-calendar-check me-3 text-muted"></i> My Bookings (As Farmer)
+                    </Link>
+                  </li>
                   <li><hr className="dropdown-divider" /></li>
                   <li>
                     <button className="dropdown-item py-2 text-danger d-flex align-items-center" onClick={logoutOwner}>

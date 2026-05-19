@@ -27,10 +27,10 @@ export default function MachineCard({ machine }) {
   };
 
   const handleBooking = async () => {
-    const token = localStorage.getItem("userToken");
+    const token = localStorage.getItem("userToken") || localStorage.getItem("ownerToken");
     if (!token) {
       setIsError(true);
-      setMessage("Please login as user to book this machine.");
+      setMessage("Please login as user or owner to book this machine.");
       return;
     }
 
@@ -150,9 +150,10 @@ export default function MachineCard({ machine }) {
           <button
             className="btn btn-success w-100"
             onClick={() => {
-              if (!localStorage.getItem("userToken")) {
+              const token = localStorage.getItem("userToken") || localStorage.getItem("ownerToken");
+              if (!token) {
                 setIsError(true);
-                setMessage("Please login as user to book this machine.");
+                setMessage("Please login as user or owner to book this machine.");
                 return;
               }
               setIsError(false);

@@ -70,7 +70,10 @@ const createBooking = async (req, res) => {
       return res.status(400).json({ message: "Invalid payment method" });
     }
 
-    const user = await User.findById(req.userId);
+    let user = await User.findById(req.userId);
+    if (!user) {
+      user = await Owner.findById(req.userId);
+    }
     if (!user) {
       return res.status(401).json({ message: "User not found for this token" });
     }

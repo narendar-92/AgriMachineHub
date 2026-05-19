@@ -12,8 +12,9 @@ module.exports = (req, res, next) => {
     const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, SECRET_KEY);
 
-    req.userId = decoded.userId;
-    req.user = { id: decoded.userId };
+    req.userId = decoded.userId || decoded.ownerId;
+    req.user = { id: req.userId };
+    req.isOwner = !!decoded.ownerId;
 
     next();
   } catch (err) {
